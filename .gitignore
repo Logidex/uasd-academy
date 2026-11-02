@@ -1,0 +1,23 @@
+
+# Java y Maven
+**/target/
+*.class
+
+# VS Code e IDE
+.vscode/
+.idea/
+
+# Node y React (futuro)
+**/node_modules/
+**/dist/
+
+# Archivos privados
+.env
+.env.*
+!.env.example
+
+# Bases de datos locales de trabajo
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
