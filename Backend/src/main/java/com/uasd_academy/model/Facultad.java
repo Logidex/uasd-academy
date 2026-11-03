@@ -5,12 +5,12 @@ public class Facultad {
 
     private int id;
     private String nombre;
-    private int fundacion;
+    private String descripcion;
 
-    public Facultad(int id, String nombre, int fundacion) {
+    public Facultad(int id, String nombre, String descripcion) {
         this.id = id;
         this.nombre = nombre;
-        this.fundacion = fundacion;
+        this.descripcion = descripcion;
     }
 
     public int getId() {
@@ -21,8 +21,8 @@ public class Facultad {
         return nombre;
     }
 
-    public int getFundacion() {
-        return fundacion;
+    public String getDescripcion() {
+        return descripcion;
     }
 
 }
