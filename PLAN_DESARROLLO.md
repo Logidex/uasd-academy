@@ -1,174 +1,525 @@
-# UASD Académica — Plan de desarrollo y bitácora
+
+# UASD Académica
+## Plan de desarrollo y aprendizaje
 
 **Proyecto:** UASD Académica  
-**Inicio:** 2 de noviembre de 2026  
-**Entrega objetivo:** 26 de noviembre de 2026  
-**Estado:** En desarrollo — primera API funcional  
-**Repositorio:** `uasd-academy` (GitHub; completar URL)  
-**Entorno:** Windows, Visual Studio Code  
+**Tipo:** Sistema de consulta académica  
+**Universidad:** Universidad Autónoma de Santo Domingo (UASD)  
+**Fecha de inicio:** 2 de noviembre de 2026  
+**Fecha de entrega:** 26 de noviembre de 2026  
+**Estado:** En desarrollo  
 
-> **Cómo usar este documento:** actualiza las casillas y el registro de avances al terminar cada sesión. No marques funciones como terminadas hasta que las hayas probado. Sube el archivo junto con tu código mediante Git.
+---
 
-## 1. Propósito
+# 1. Descripción del proyecto
 
-Desarrollar un sistema de consulta académica de la Universidad Autónoma de Santo Domingo que permita consultar carreras por escuela desde una base de datos. Se construirá una versión web local: backend Java con API REST y frontend web. Se procurará un diseño claro y moderno, con espacio para ampliar el catálogo a asignaturas y planes de estudio.
+UASD Académica será una aplicación web local desarrollada con Java y Spring Boot en el backend, React y TypeScript en el frontend y SQLite como base de datos.
 
-### Requisito mínimo de la asignación
-- [ ] Consultar carreras por escuela seleccionada.
-- [ ] Disponer de un botón que realice la consulta.
-- [ ] Recuperar los registros de una base de datos, no de una lista fija en el código.
-- [ ] Demostrar una aplicación funcionando con Java.
-- [ ] Confirmar que el profesor acepta una interfaz web local con backend Java, en lugar de una ventana de escritorio Java.
+El sistema permitirá consultar información académica de la Universidad Autónoma de Santo Domingo.
 
-### Alcance ampliado (sujeto al tiempo y a fuentes verificadas)
-- [ ] Consultar facultades, escuelas y carreras.
-- [ ] Buscar carreras por nombre.
-- [ ] Consultar detalles de una carrera.
-- [ ] Mostrar asignaturas y planes de estudio que se hayan podido verificar.
-- [ ] Mostrar créditos, semestres y prerrequisitos cuando existan datos confiables.
+Inicialmente, permitirá seleccionar una escuela y visualizar las carreras que ofrece.
 
-### Fuera del alcance obligatorio para esta entrega
-- Cargar **todos** los pénsums y materias si no se obtienen fuentes confiables a tiempo.
-- Sistema de inscripción o autenticación institucional.
-- Sincronización con sistemas privados de la UASD.
-- Aplicación móvil y publicación en servidores públicos.
+Posteriormente, podrá incorporar planes de estudio, asignaturas, créditos y prerrequisitos.
 
-## 2. Tecnologías y arquitectura
+El proyecto estará organizado para permitir futuras ampliaciones.
 
-| Componente | Elección | Estado |
-|---|---|---|
-| Editor | Visual Studio Code | En uso |
-| Lenguaje backend | Java (el entorno actual ejecuta Java 27) | En uso |
-| Framework backend | Spring Boot 4.1.2 | En uso |
-| Gestor de proyecto | Maven / Maven Wrapper | En uso |
-| API | HTTP REST con JSON | Primer endpoint listo |
-| Base de datos | SQLite | Pendiente |
-| Acceso a datos | JDBC o repositorios según diseño | Pendiente |
-| Frontend | React + TypeScript + CSS | Pendiente |
-| Versionado | Git + GitHub | Repositorio publicado |
+---
 
-### Flujo previsto
+# 2. Objetivo general
 
-`Navegador (React) → HTTP/JSON → Java (Spring Boot) → consultas SQL → SQLite`
+Desarrollar un sistema de información académica que permita consultar las carreras ofertadas por la Universidad Autónoma de Santo Domingo mediante una interfaz gráfica conectada a una base de datos local.
 
-En desarrollo, frontend y backend pueden ejecutarse en puertos distintos. Para la entrega, se evaluará servir la compilación de React desde Spring Boot y mantener una instalación local sencilla.
+## 2.1. Objetivos específicos
 
-## 3. Estructura actual del proyecto
+- Diseñar una base de datos relacional.
+- Registrar facultades, escuelas y carreras.
+- Desarrollar una API REST utilizando Java y Spring Boot.
+- Implementar consultas SQL desde Java.
+- Crear una interfaz gráfica moderna utilizando React.
+- Conectar el frontend con el backend.
+- Permitir consultar carreras según la escuela seleccionada.
+- Implementar búsquedas y filtros.
+- Documentar y probar el funcionamiento del sistema.
+- Publicar el código fuente en GitHub.
 
-```text
-uasd-academy/
-├── Backend/
-│   ├── src/main/java/com/uasd_academy/
-│   │   ├── UasdAcademyApplication.java
-│   │   ├── controller/
-│   │   │   ├── HolaController.java
-│   │   │   └── FacultadController.java
-│   │   └── model/
-│   │       └── Facultad.java
-│   ├── src/main/resources/application.properties
-│   ├── pom.xml
-│   └── mvnw.cmd
-├── PLAN_DESARROLLO.md
-└── README.md  (si existe en la raíz)
-```
+---
 
-**Nota:** la clase `Facultad.java` se trabajó durante las lecciones; confirmar en VS Code que esté guardada con constructor y getters. En `FacultadController.java`, el paquete debe ser `com.uasd_academy.controller`.
+# 3. Tecnologías
 
-## 4. Estado de implementación
-
-### Completado y confirmado
-- [x] Crear proyecto Maven / Spring Boot.
-- [x] Configurar la ejecución desde VS Code.
-- [x] Iniciar Tomcat en `localhost:8080`.
-- [x] Crear y probar el endpoint `GET /api/hola`.
-- [x] Corregir el nombre del paquete del controlador Hola.
-- [x] Publicar el proyecto en GitHub.
-
-### En progreso / por verificar
-- [ ] Confirmar que `Facultad.java` tiene atributos, constructor y getters.
-- [ ] Compilar y probar `GET /api/facultad`.
-- [ ] Comprobar que devuelve JSON con `id`, `nombre` y `fundacion`.
-
-### Próximas funciones
-- [ ] Devolver una lista de objetos Facultad.
-- [ ] Aprender colecciones `List`, parámetros y respuestas HTTP.
-- [ ] Crear tablas relacionales en SQLite.
-- [ ] Consultar desde Java las facultades, escuelas y carreras almacenadas.
-- [ ] Crear una pantalla web para seleccionar escuela y consultar carreras.
-- [ ] Integrar React con la API.
-- [ ] Probar y empaquetar la entrega.
-
-## 5. Cronograma de referencia
-
-| Fechas | Meta | Entregable verificable |
-|---|---|---|
-| 2–5 nov. | Entorno, Git y primera API | `GET /api/hola` responde |
-| 6–11 nov. | Modelos, base de datos y consultas Java | API de carreras basada en SQLite |
-| 12–17 nov. | Interfaz React y conexión con backend | Seleccionar escuela y ver carreras |
-| 18–21 nov. | Detalles y datos académicos adicionales | Consultas ampliadas y búsqueda |
-| 22–25 nov. | Pruebas, correcciones, documentación | Versión instalable/ejecutable y demostrable |
-| 26 nov. | Entrega | Repositorio y proyecto funcionando |
-
-**Regla de prioridad:** si existe retraso, terminar primero el flujo mínimo *escuela → botón → API Java → SQLite → lista de carreras*. Congelar funciones nuevas a partir del 21 de noviembre.
-
-## 6. Registro de avances (bitácora)
-
-| Fecha | Actividad | Resultado | Próximo paso |
-|---|---|---|---|
-| 02/11/2026 | Creación de proyecto Spring Boot | Servidor arranca en puerto 8080 | Primera ruta REST |
-| 02/11/2026 | Corrección del paquete de `HolaController` | `/api/hola` funciona | Publicar repositorio |
-| 02/11/2026 | Subida inicial a GitHub | Repositorio publicado | Crear modelo Facultad |
-| 02/11/2026 | Introducción a clases, constructor y getters | Ejercicios realizados; controlador de facultad escrito | Probar `/api/facultad` |
-
-### Plantilla para cada sesión
-
-```text
-Fecha:
-Objetivo:
-Qué aprendí:
-Archivos modificados:
-Pruebas realizadas:
-Errores encontrados y solución:
-Commit de Git:
-Siguiente tarea:
-```
-
-## 7. Validación y pruebas
-
-- [x] `GET http://localhost:8080/api/hola` responde correctamente.
-- [ ] `GET http://localhost:8080/api/facultad` responde JSON correcto.
-- [ ] La API devuelve listas de carreras desde SQLite.
-- [ ] Un filtro por escuela devuelve solamente sus carreras.
-- [ ] Los datos vacíos muestran un mensaje comprensible.
-- [ ] La aplicación puede ejecutarse en una computadora distinta.
-- [ ] El README contiene instrucciones reproducibles.
-- [ ] El repositorio no incluye contraseñas ni archivos de compilación.
-
-## 8. Fuentes y calidad de datos
-
-Fuentes institucionales a revisar:
-- https://app.uasd.edu.do/planesgrado/
-- https://uasd.edu.do/vicerrectoria-docente/ofertas-academicas/
-
-**Regla:** no presentar años de fundación, códigos, créditos o materias inventados como información oficial. Los datos de ejemplo utilizados para aprender se sustituirán por registros verificados antes de la entrega. Guardar nombre, URL y fecha de consulta de cada fuente utilizada.
-
-## 9. Riesgos y decisiones pendientes
-
-| Riesgo o decisión | Medida propuesta |
+| Tecnología | Utilización |
 |---|---|
-| Demasiadas funcionalidades en 24 días | Priorizar requisito mínimo y pruebas |
-| Datos oficiales incompletos | Identificar cobertura; usar solo datos verificados |
-| Profesor podría exigir escritorio | Confirmar aceptación de app web local cuanto antes |
-| Java 27 en el entorno actual | Comprobar compatibilidad y documentar requisitos de ejecución |
-| Dificultades con React / integración | Mantener API independiente y funcional |
-| Problemas al instalar en otro equipo | Preparar instrucciones y prueba de instalación limpia |
+| Java | Lenguaje del backend |
+| Spring Boot | Desarrollo de API REST |
+| Maven | Gestión de dependencias |
+| SQLite | Base de datos local |
+| JDBC | Comunicación con la base de datos |
+| React | Interfaz de usuario |
+| TypeScript | Lógica del frontend |
+| CSS | Diseño visual |
+| Git | Control de versiones |
+| GitHub | Repositorio del proyecto |
+| VS Code | Entorno de desarrollo |
 
-## 10. Próximo paso inmediato
+## 3.1. Arquitectura
 
-1. Guardar `Facultad.java` con constructor y getters.
-2. Ejecutar el backend.
-3. Abrir `http://localhost:8080/api/facultad` y verificar la respuesta JSON.
-4. Corregir errores antes de introducir más conceptos.
-5. Registrar la prueba y crear un commit.
+El sistema estará dividido en tres componentes:
 
-**Convención de commits sugerida:** `feat:`, `fix:`, `docs:`, `test:`.
+### Frontend
+
+Responsable de mostrar la información y permitir la interacción con el usuario.
+
+Tecnologías:
+
+- React
+- TypeScript
+- CSS
+
+### Backend
+
+Responsable de recibir solicitudes, procesar información y consultar la base de datos.
+
+Tecnologías:
+
+- Java
+- Spring Boot
+- JDBC
+
+### Base de datos
+
+Responsable de almacenar la información académica.
+
+Tecnología:
+
+- SQLite
+
+Comunicación:
+
+Frontend → API REST → Backend → SQLite
+
+---
+
+# 4. Requisitos funcionales
+
+## 4.1. Funcionalidades obligatorias
+
+- [ ] RF01: Consultar facultades.
+- [ ] RF02: Consultar escuelas pertenecientes a una facultad.
+- [ ] RF03: Consultar carreras pertenecientes a una escuela.
+- [ ] RF04: Seleccionar una escuela desde la interfaz gráfica.
+- [ ] RF05: Mostrar las carreras mediante un botón.
+- [ ] RF06: Obtener la información desde SQLite.
+- [ ] RF07: Buscar carreras por nombre.
+- [ ] RF08: Mostrar información básica de cada carrera.
+- [ ] RF09: Ejecutar el sistema localmente.
+- [ ] RF10: Entregar el código fuente mediante GitHub.
+
+## 4.2. Funcionalidades opcionales
+
+Estas funcionalidades se implementarán solamente si las obligatorias están terminadas.
+
+- [ ] Consultar asignaturas de una carrera.
+- [ ] Mostrar el pénsum por semestre.
+- [ ] Mostrar créditos académicos.
+- [ ] Consultar prerrequisitos.
+- [ ] Visualizar relaciones entre asignaturas.
+- [ ] Implementar planificación académica.
+- [ ] Exportar información a PDF.
+- [ ] Incorporar modo oscuro.
+- [ ] Desarrollar un panel administrativo.
+
+---
+
+# 5. Modelo de datos inicial
+
+## 5.1. Facultad
+
+Atributos:
+
+- id
+- nombre
+- descripción
+
+## 5.2. Escuela
+
+Atributos:
+
+- id
+- nombre
+- facultad_id
+
+## 5.3. Carrera
+
+Atributos:
+
+- id
+- código
+- nombre
+- escuela_id
+- descripción
+
+## 5.4. Plan de estudio
+
+Atributos:
+
+- id
+- carrera_id
+- versión
+- fecha de vigencia
+
+## 5.5. Asignatura
+
+Atributos:
+
+- id
+- código
+- nombre
+- créditos
+
+## 5.6. PlanAsignatura
+
+Relaciona las asignaturas con los planes de estudio.
+
+Atributos:
+
+- plan_id
+- asignatura_id
+- semestre
+
+Las tablas definitivas se diseñarán antes de implementar SQLite.
+
+---
+
+# 6. Metodología de desarrollo
+
+Cada funcionalidad seguirá cinco etapas:
+
+1. Definir qué problema resolverá.
+2. Estudiar los conceptos necesarios.
+3. Diseñar las clases, datos y responsabilidades.
+4. Implementar la funcionalidad mediante ejercicios.
+5. Probar, documentar y subir los cambios a GitHub.
+
+No se implementarán funcionalidades sin comprender primero sus conceptos principales.
+
+---
+
+# 7. Módulos de aprendizaje
+
+## Módulo 1: Fundamentos de Java
+
+### Conceptos
+
+- [ ] Sintaxis básica.
+- [ ] Variables y tipos de datos.
+- [ ] Operadores.
+- [ ] Condicionales.
+- [ ] Bucles.
+- [ ] Métodos y parámetros.
+- [ ] Clases y objetos.
+- [ ] Constructores.
+- [ ] Encapsulamiento.
+- [ ] Getters y setters.
+- [ ] Listas y colecciones.
+- [ ] Manejo básico de excepciones.
+
+### Práctica
+
+Crear objetos que representen facultades, escuelas y carreras.
+
+### Criterio de finalización
+
+Poder crear, almacenar y recorrer una lista de objetos sin copiar una solución completa.
+
+---
+
+## Módulo 2: Fundamentos de Spring Boot
+
+### Conceptos
+
+- [ ] Cliente y servidor.
+- [ ] HTTP.
+- [ ] Métodos GET y POST.
+- [ ] API REST.
+- [ ] JSON.
+- [ ] Controladores.
+- [ ] Servicios.
+- [ ] Inyección de dependencias.
+- [ ] Respuestas y códigos HTTP.
+
+### Práctica
+
+Crear API para consultar facultades y carreras utilizando datos temporales.
+
+### Criterio de finalización
+
+Poder desarrollar un endpoint GET que devuelva una lista de objetos en JSON.
+
+---
+
+## Módulo 3: Bases de datos
+
+### Conceptos
+
+- [ ] Bases de datos relacionales.
+- [ ] Tablas y registros.
+- [ ] Claves primarias.
+- [ ] Claves foráneas.
+- [ ] Relaciones uno a muchos.
+- [ ] SELECT.
+- [ ] INSERT.
+- [ ] UPDATE.
+- [ ] DELETE.
+- [ ] JOIN.
+- [ ] JDBC.
+- [ ] Consultas parametrizadas.
+
+### Práctica
+
+Crear las tablas académicas y conectarlas con Java.
+
+### Criterio de finalización
+
+Consultar carreras desde SQLite utilizando Java.
+
+---
+
+## Módulo 4: Catálogo académico
+
+### Funcionalidades
+
+- [ ] Consultar facultades.
+- [ ] Consultar escuelas.
+- [ ] Consultar carreras.
+- [ ] Filtrar carreras por escuela.
+- [ ] Buscar carreras.
+- [ ] Importar datos académicos verificados.
+
+### Criterio de finalización
+
+Tener una API conectada a SQLite que devuelva información académica real.
+
+---
+
+## Módulo 5: Frontend
+
+### Conceptos
+
+- [ ] Componentes React.
+- [ ] Props.
+- [ ] Estado.
+- [ ] Eventos.
+- [ ] useEffect.
+- [ ] Fetch API.
+- [ ] TypeScript aplicado a React.
+- [ ] CSS Grid.
+- [ ] Flexbox.
+- [ ] Diseño adaptable.
+
+### Funcionalidades
+
+- [ ] Crear página principal.
+- [ ] Crear navegación.
+- [ ] Mostrar facultades.
+- [ ] Mostrar escuelas.
+- [ ] Mostrar carreras.
+- [ ] Agregar botones.
+- [ ] Agregar búsqueda.
+- [ ] Diseñar tarjetas académicas.
+
+### Criterio de finalización
+
+Poder navegar y consultar información desde una interfaz gráfica.
+
+---
+
+## Módulo 6: Integración
+
+### Funcionalidades
+
+- [ ] Conectar React con Spring Boot.
+- [ ] Consumir respuestas JSON.
+- [ ] Implementar consulta mediante botones.
+- [ ] Mostrar mensajes de error.
+- [ ] Mostrar estados de carga.
+- [ ] Manejar resultados vacíos.
+
+### Criterio de finalización
+
+Seleccionar una escuela y visualizar sus carreras obtenidas desde SQLite.
+
+---
+
+## Módulo 7: Pruebas y mejoras
+
+### Actividades
+
+- [ ] Probar los endpoints.
+- [ ] Verificar las consultas SQL.
+- [ ] Probar la navegación.
+- [ ] Manejar errores.
+- [ ] Corregir problemas visuales.
+- [ ] Validar datos académicos.
+- [ ] Revisar rendimiento básico.
+
+---
+
+## Módulo 8: Entrega
+
+### Actividades
+
+- [ ] Actualizar README.
+- [ ] Documentar instalación.
+- [ ] Documentar ejecución.
+- [ ] Crear scripts de base de datos.
+- [ ] Probar el proyecto desde cero.
+- [ ] Verificar el repositorio de GitHub.
+- [ ] Preparar demostración.
+- [ ] Entregar proyecto.
+
+---
+
+# 8. Cronograma
+
+## 2 al 5 de noviembre
+
+Análisis, planificación y configuración.
+
+## 6 al 11 de noviembre
+
+Fundamentos necesarios de Java y desarrollo inicial del backend.
+
+## 12 al 17 de noviembre
+
+Base de datos, consultas y primera interfaz funcional.
+
+## 18 al 21 de noviembre
+
+Integración, diseño visual y funcionalidades complementarias.
+
+## 22 al 25 de noviembre
+
+Pruebas, documentación y correcciones.
+
+## 26 de noviembre
+
+Entrega del proyecto.
+
+Este cronograma podrá ajustarse según los avances.
+
+---
+
+# 9. Estado actual
+
+## Completado
+
+- [x] Proyecto Spring Boot creado.
+- [x] Java configurado.
+- [x] Maven funcionando.
+- [x] Servidor local iniciado correctamente.
+- [x] API Hola Mundo funcionando.
+- [x] Repositorio creado en GitHub.
+- [x] Primer código publicado.
+
+## En desarrollo
+
+- [ ] Comprender completamente clases y objetos.
+- [ ] Comprender constructores.
+- [ ] Practicar encapsulamiento.
+- [ ] Comprender getters y setters.
+- [ ] Probar API de facultades.
+
+## Pendiente
+
+- [ ] Completar los fundamentos necesarios.
+- [ ] Crear una API de listas de facultades.
+- [ ] Diseñar SQLite.
+- [ ] Implementar consultas reales.
+- [ ] Crear frontend.
+- [ ] Integrar backend y frontend.
+- [ ] Preparar entrega.
+
+---
+
+# 10. Registro de avances
+
+## 2 de noviembre de 2026
+
+### Actividades
+
+- Configuración de Spring Boot.
+- Creación del proyecto.
+- Primera ejecución del servidor.
+- Implementación de HolaController.
+- Corrección de paquetes de Java.
+- Prueba del endpoint /api/hola.
+- Publicación del proyecto en GitHub.
+- Introducción a clases y constructores.
+- Creación inicial de Facultad y FacultadController.
+
+### Problemas encontrados
+
+El endpoint /api/hola devolvía error 404 porque el paquete del controlador no coincidía con el paquete principal.
+
+### Solución
+
+Se corrigió la declaración package del controlador y se reinició Spring Boot.
+
+### Resultado
+
+Primera API REST funcionando correctamente.
+
+---
+
+# 11. Reglas de desarrollo
+
+1. Comprender antes de programar.
+2. No incorporar tecnologías innecesarias.
+3. Mantener el código organizado.
+4. Utilizar nombres claros.
+5. Separar responsabilidades.
+6. Probar cada funcionalidad.
+7. No subir contraseñas ni información privada.
+8. Crear commits descriptivos.
+9. Actualizar este documento.
+10. Priorizar una entrega funcional.
+
+---
+
+# 12. Definición de terminado
+
+Una funcionalidad se considerará terminada solamente cuando:
+
+- El código compile correctamente.
+- El funcionamiento haya sido probado.
+- No tenga errores conocidos que impidan su uso.
+- Se comprenda su lógica principal.
+- Se haya actualizado la documentación.
+- Los cambios estén registrados en Git.
+
+---
+
+# 13. Próxima actividad
+
+Retomar el Módulo 1: Fundamentos de Java.
+
+Revisar y practicar:
+
+1. Clases y objetos.
+2. Constructores.
+3. Métodos.
+4. Encapsulamiento.
+5. Getters y setters.
+6. Listas de objetos.
+
+Después utilizaremos esos conocimientos para completar FacultadController y devolver información en JSON.
+
+---
+
+# 14. Objetivo final
+
+Entregar el 26 de noviembre de 2026 un sistema funcional desarrollado con Java, Spring Boot, React, TypeScript y SQLite, capaz de consultar carreras de la UASD mediante una interfaz gráfica.
+
+El proyecto deberá ejecutarse localmente, contar con documentación y estar disponible en GitHub.
+
+Las funcionalidades avanzadas podrán incorporarse posteriormente como parte de una versión ampliada de UASD Académica.
+
