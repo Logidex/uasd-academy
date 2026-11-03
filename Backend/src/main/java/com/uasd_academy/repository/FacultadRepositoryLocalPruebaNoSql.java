@@ -3,7 +3,7 @@ package com.uasd_academy.repository;
 import com.uasd_academy.model.Facultad;
 import java.util.List;
 
-public class FacultadRepositoryLocal implements FacultadRepository {
+public class FacultadRepositoryLocalPruebaNoSql implements FacultadRepository {
 
     @Override
     public List<Facultad> obtenerTodas() {

@@ -8,4 +8,6 @@ public interface EscuelaRepository {
 
     List<Escuela> obtenerTodas();
 
+    List<Escuela> obtenerPorFacultad(int idFacultad);
+
 }

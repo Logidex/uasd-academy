@@ -1,7 +1,8 @@
 
-package com.uasd_academy.repository;
+package com.uasd_academy.repository.sqlite;
 
-import com.uasd_academy.model.Escuela;
+import com.uasd_academy.model.Facultad;
+import com.uasd_academy.repository.FacultadRepository;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Files;
@@ -15,12 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class EscuelaRepositorySQLite implements EscuelaRepository {
+public class FacultadRepositorySQLite implements FacultadRepository {
 
     @Override
-    public List<Escuela> obtenerTodas() {
+    public List<Facultad> obtenerTodas() {
 
-        List<Escuela> escuelas = new ArrayList<>();
+        List<Facultad> facultades = new ArrayList<>();
 
         Path ruta = Path.of("../database/uasd.db")
                 .toAbsolutePath()
@@ -35,41 +36,36 @@ public class EscuelaRepositorySQLite implements EscuelaRepository {
         String url = "jdbc:sqlite:" + ruta;
 
         String sql = """
-                SELECT id_escuela, nombre, id_facultad
-                FROM escuelas
+                SELECT id_facultad, nombre, descripcion
+                FROM facultades
                 ORDER BY nombre
                 """;
 
-        try (
-                Connection conexion = DriverManager.getConnection(url);
-                PreparedStatement consulta = conexion.prepareStatement(sql);
-                ResultSet resultado = consulta.executeQuery()
-        ) {
+        try (Connection conexion = DriverManager.getConnection(url);
+             PreparedStatement consulta = conexion.prepareStatement(sql);
+             ResultSet resultado = consulta.executeQuery()) {
 
             while (resultado.next()) {
 
-                int id = resultado.getInt("id_escuela");
+                int id = resultado.getInt("id_facultad");
                 String nombre = resultado.getString("nombre");
-                int idFacultad = resultado.getInt("id_facultad");
+                String descripcion = resultado.getString("descripcion");
 
-                Escuela escuela = new Escuela(
+                Facultad facultad = new Facultad(
                         id,
                         nombre,
-                        idFacultad
+                        descripcion
                 );
 
-                escuelas.add(escuela);
+                facultades.add(facultad);
             }
 
         } catch (SQLException e) {
-
             throw new IllegalStateException(
-                    "Error al consultar las escuelas en SQLite",
-                    e
+                    "Error al consultar las facultades en SQLite", e
             );
         }
 
-        return escuelas;
+        return facultades;
     }
 }
-

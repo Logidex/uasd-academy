@@ -19,4 +19,9 @@ public class EscuelaService {
     public List<Escuela> listarEscuelas() {
         return repository.obtenerTodas();
     }
+
+    public List<Escuela> listarEscuelasPorFacultad(int idFacultad) {
+        return repository.obtenerPorFacultad(idFacultad);
+    }
 }
+
