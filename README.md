@@ -16,11 +16,13 @@ Se han procesado **114 documentos de pensum**, distribuidos entre **9 facultades
 | Escuelas | 50 |
 | Registros de carreras y programas | 115 |
 | Materias únicas | 2,864 |
-| Relaciones carrera–materia | 6,209 |
+| Relaciones carrera–materia | 6,210 |
 
 Los **115 registros de programas no equivalen necesariamente a 115 carreras distintas o vigentes**: incluyen menciones, programas técnicos y versiones de planes. Los 114 documentos procesados tampoco significan que todos los planes sean actuales.
 
-**Caso especial pendiente de integrar al instalador:** el plan `000011` de **Licenciatura en Geografía** contiene el bloque previo «Colegio Universitario» (`AAA-0000`, 36 créditos), sin semestre convencional. En la instalación automática publicada, ese bloque no se enlaza a la carrera: Geografía muestra 139 créditos en lugar de los 175 indicados en el PDF. Una migración separada permite añadirlo como período `0`, elevando las relaciones totales a **6,210** sin crear materias nuevas. Dicha migración todavía no forma parte de `inicializar.py` ni de `schema.sql` en la versión revisada del repositorio. Si ya la aplicaste manualmente a tu base local, **no la reconstruyas** solo para seguir estos pasos.
+**Bloque especial de Geografía integrado:** el plan `000011` de **Licenciatura en Geografía** incluye «Colegio Universitario» (`AAA-0000`, 36 créditos) como un bloque previo, sin semestre convencional. El sistema lo representa como `periodo = 0`. Por tanto, el plan muestra **41 componentes y 175 créditos**, y la instalación completa genera **6,210 relaciones**. No se crea una materia adicional: se utiliza el código `AAA-0000` ya registrado.
+
+El instalador incorpora esta corrección **si se utilizan juntos** `database/schema.sql`, `database/inicializar.py` y `database/pensums/ajustes/01_colegio_geografia.sql` de la versión actualizada. Estos cambios están pensados para instalaciones nuevas; modificar `schema.sql` no migra automáticamente una base ya creada.
 
 ## Tecnologías
 
@@ -54,7 +56,9 @@ uasd-academy/
 │   │   ├── salud/
 │   │   ├── humanidades/
 │   │   ├── ingenieria/
-│   │   └── educacion/
+│   │   ├── educacion/
+│   │   └── ajustes/                  # Bloque previo de Geografía (período 0)
+│   │       └── 01_colegio_geografia.sql
 │   ├── inicializar.py                 # Reconstrucción completa y validación
 │   └── inicializar.ps1                # Acceso rápido desde PowerShell
 └── README.md
@@ -95,7 +99,7 @@ python inicializar.py
 cd ..
 ```
 
-El inicializador ejecuta **15 scripts SQL**, empezando por la estructura y terminando con Ingeniería Geomática. Incluye la normalización de códigos que evita duplicar las carreras de Periodismo y Psicología Clínica. Antes de reemplazar un archivo existente, comprueba claves foráneas, integridad y los conteos esperados.
+El inicializador ejecuta **16 scripts SQL**, empezando por la estructura y terminando con el ajuste de Colegio Universitario para Geografía. Incluye la normalización de códigos que evita duplicar las carreras de Periodismo y Psicología Clínica. Antes de reemplazar un archivo existente, comprueba claves foráneas, integridad y los conteos esperados.
 
 **Si `database/uasd.db` ya existe, el programa no la sobrescribe.** Para comprobar la base existente sin modificarla:
 
@@ -150,9 +154,22 @@ PRAGMA foreign_key_check;
 PRAGMA integrity_check;
 ```
 
-Con la reconstrucción automática publicada, los conteos esperados son **9, 50, 115, 2,864 y 6,209**, respectivamente. `foreign_key_check` debe devolver **cero filas** y `integrity_check` debe devolver `ok`.
+Con el instalador actualizado, los conteos esperados son **9 facultades, 50 escuelas, 115 registros de programas, 2,864 materias y 6,210 relaciones**. `foreign_key_check` debe devolver **cero filas** e `integrity_check` debe devolver `ok`.
 
-Si aplicaste a tu base local el ajuste especial de Geografía, el último conteo será **6,210**. Ese valor diferente no indica un error en sí mismo.
+Como comprobación adicional del caso especial:
+
+```sql
+SELECT c.nombre AS carrera,
+       COUNT(*) AS componentes,
+       SUM(m.creditos) AS total_creditos
+FROM carreras c
+JOIN carrera_materias cm ON cm.id_carrera = c.id_carrera
+JOIN materias m ON m.id_materia = cm.id_materia
+WHERE c.codigo = 'PLAN-P-GEOG'
+GROUP BY c.id_carrera, c.nombre;
+```
+
+El resultado esperado es **41 componentes y 175 créditos**. Si una instalación anterior muestra 139 créditos, no basta con modificar `schema.sql`: hay que utilizar la migración específica para esa base existente.
 
 ## 3. Ejecutar el backend Java
 
@@ -201,9 +218,9 @@ Casos útiles de verificación:
 |---|---|
 | Licenciatura en Informática, plan `200820` | 51 materias, 186 créditos |
 | Ingeniería Geomática, plan `200910` | 23 asignaturas, 76 créditos |
-| Licenciatura en Geografía, plan `000011` | 139 créditos en instalación base; 175 si se aplicó la migración del bloque previo |
+| Licenciatura en Geografía, plan `000011` | 41 componentes, 175 créditos, incluyendo bloque previo (período 0) |
 
-**Presentación pendiente:** el frontend publicado muestra encabezados numéricos como `Período 0`. Se recomienda mostrar `Colegio Universitario (bloque previo)` cuando corresponda y distinguir tesis e internados de los períodos académicos ordinarios. La consulta de Java no depende de ese cambio visual.
+**Presentación de períodos especiales:** el período `0` representa «Colegio Universitario (bloque previo)» en Geografía; tesis e internados pueden aparecer como bloques adicionales del plan. El backend Java devuelve el número de período y la interfaz debe mostrar etiquetas comprensibles.
 
 ## 6. Pruebas del proyecto
 
@@ -235,7 +252,7 @@ El chequeo `--verificar` comprueba la integridad y muestra los conteos reales; *
 - La tabla `fuentes_pensum` permite registrar referencias y versiones de los documentos procesados.
 - Las tablas con nombres como `_edu_*`, `_huma_*` o `_ing_*` son **auxiliares temporales** usadas durante importaciones; no son necesarias para las consultas normales de React y Java.
 - Las tablas permanentes principales son `facultades`, `escuelas`, `carreras`, `materias`, `carrera_materias` y `fuentes_pensum`.
-- El esquema de la versión revisada utiliza `CHECK (periodo > 0)`. Para incorporar el bloque previo de Geografía como `periodo = 0` en **futuras reconstrucciones**, aún falta actualizar `schema.sql` e integrar su migración al inicializador. **No basta con editar `schema.sql` para alterar una base ya creada.**
+- El esquema actualizado utiliza `CHECK (periodo >= 0)` para admitir bloques previos como Colegio Universitario. El script `pensums/ajustes/01_colegio_geografia.sql` se ejecuta en último lugar en `inicializar.py`. **No basta con editar `schema.sql` para alterar una base ya creada.**
 
 Fuentes de consulta institucional: [Planes de grado UASD](https://app.uasd.edu.do/planesgrado/) y [Oferta académica UASD](https://uasd.edu.do/oferta-academica/).
 
