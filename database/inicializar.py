@@ -30,9 +30,10 @@ SCRIPT_ORDER = [
     'pensums/ingenieria/pensums_ingenieria_13.sql',
     'pensums/educacion/pensums_educacion_27.sql',
     'pensums/ingenieria/pensum_geomatica_200910.sql',
+    'pensums/ajustes/01_colegio_geografia.sql',
 ]
 EXPECTED = {'facultades':9, 'escuelas':50, 'carreras':115,
-            'materias':2864, 'carrera_materias':6209}
+            'materias':2864, 'carrera_materias':6210}
 
 
 def check(conn, strict=False):
@@ -55,6 +56,15 @@ def check(conn, strict=False):
     """).fetchone()
     if strict and tuple(geom) != (23, 76):
         raise RuntimeError(f'Geomática: se esperaba (23 materias, 76 creditos), obtenido {tuple(geom)}')
+    geog = conn.execute("""
+      SELECT COUNT(*), COALESCE(SUM(m.creditos), 0)
+      FROM carreras c JOIN carrera_materias cm ON cm.id_carrera=c.id_carrera
+      JOIN materias m ON m.id_materia=cm.id_materia
+      WHERE c.codigo='PLAN-P-GEOG'
+    """).fetchone()
+    if strict and tuple(geog) != (41, 175):
+        raise RuntimeError(f'Geografia: se esperaba (41 componentes, 175 creditos), obtenido {tuple(geog)}')
+    print(f'Geografia: {geog[0]} componentes, {geog[1]} creditos')
     print('Conteos:', ', '.join(f'{k}={v}' for k,v in actual.items()))
     print(f'Geomatica: {geom[0]} materias, {geom[1]} creditos; integridad OK')
     return actual

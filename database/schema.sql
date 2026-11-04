@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS materias (
 CREATE TABLE IF NOT EXISTS carrera_materias (
     id_carrera INTEGER NOT NULL,
     id_materia INTEGER NOT NULL,
-    periodo INTEGER NOT NULL CHECK (periodo > 0),
+    periodo INTEGER NOT NULL CHECK (periodo >= 0),
 
     PRIMARY KEY (id_carrera, id_materia),
 
