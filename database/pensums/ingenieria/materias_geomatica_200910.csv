@@ -1,0 +1,24 @@
+﻿programa,plan,codigo,nombre_pdf,creditos,periodo,prerrequisitos_pdf,equivalencias_pdf
+P-IGEO,200910,AGM-5000,Introducción a la Geomática,2,1,,
+P-IGEO,200910,AGM-5010,Tecnología Computacional I,2,1,,
+P-IGEO,200910,EST-1110,Estadística General,4,1,MAT0120 / MAT0140 / MAT0800 / MAT0110 / MAT0840 / MAT0130 / MAT1200,"EST1100, EST1120, EST1210, EST1220, EST1320, EST2110, EST2210, EST3130"
+P-IGEO,200910,FIS-5050,Física General II-A,3,1,,
+P-IGEO,200910,MAT-2580,Cálculo y Analítica II,5,1,,"MAT2130, MAT2530, MAT3500"
+P-IGEO,200910,AGM-5020,Errores y Ajustes,3,2,EST1110 / EST1210,
+P-IGEO,200910,AGM-5030,Tecnología Computacional II,2,2,AGM5010,
+P-IGEO,200910,AGM-5040,Normatización Catastral,2,2,AGM5000,
+P-IGEO,200910,IDI-0130,Inglés Técnico,4,2,IDI0230 / IDI0210 / IDI0280,
+P-IGEO,200910,MAT-3600,Ecuaciones Diferenciales,5,2,MAT2840 / MAT3500 / MAT3510 / MAT3520 / MAT3570,"MAT3110, MAT3610"
+P-IGEO,200910,AGM-5050,Geodesia I,4,3,MAT3600,
+P-IGEO,200910,AGM-5060,Aplics Computacionales en Top,3,3,AGM5030,
+P-IGEO,200910,AGM-5070,Sistema de Inf Geográfica I,3,3,AGM5030,
+P-IGEO,200910,AGM-5080,Fotogamet y Fotointer Aplic,3,3,AGM5030,
+P-IGEO,200910,ECN-1100,Nociones de Economía,3,3,,"ECN1110, ECN1150, ECN2110"
+P-IGEO,200910,AGM-5090,Sistema de Inf Geográfica II,3,4,AGM5070,
+P-IGEO,200910,AGM-5100,Análisis de Imag y Teledet,3,4,AGM5080,
+P-IGEO,200910,AGM-5110,Topografía Vial,4,4,AGM5060,
+P-IGEO,200910,AGM-5120,Geodesia II,4,4,AGM5050,
+P-IGEO,200910,AGM-5130,Ingeniería Ambiental,2,5,AGM5090,
+P-IGEO,200910,AGM-5140,Análisis de Costo y Presupuest,2,5,ECN1100,
+P-IGEO,200910,AGM-5150,Administ de Proyecto Geomático,2,5,ECN1100,
+P-IGEO,200910,AGM-7000,Tesis de Grado,8,5,,

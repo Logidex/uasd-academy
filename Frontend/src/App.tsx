@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import "./App.css";
 
@@ -84,7 +83,7 @@ function App() {
 
     try {
       const datos = await consultarAPI<Escuela[]>(
-        `/api/escuelas/facultad/${id}`
+        `/api/escuelas/facultad/${id}`,
       );
 
       setEscuelas(datos);
@@ -118,7 +117,7 @@ function App() {
 
     try {
       const datos = await consultarAPI<Carrera[]>(
-        `/api/carreras/escuela/${idEscuela}`
+        `/api/carreras/escuela/${idEscuela}`,
       );
 
       setCarreras(datos);
@@ -139,7 +138,7 @@ function App() {
 
     try {
       const datos = await consultarAPI<Materia[]>(
-        `/api/materias/carrera/${id}`
+        `/api/materias/carrera/${id}`,
       );
 
       setMaterias(datos);
@@ -151,25 +150,25 @@ function App() {
     }
   }
 
-  const carreraActual = carreras.find(c => c.idCarrera === idCarrera);
+  const carreraActual = carreras.find((c) => c.idCarrera === idCarrera);
 
-  const periodos = [...new Set(materias.map(m => m.periodo))]
-    .sort((a, b) => a - b);
+  const periodos = [...new Set(materias.map((m) => m.periodo))].sort(
+    (a, b) => a - b,
+  );
 
   const totalCreditos = materias.reduce(
     (total, materia) => total + materia.creditos,
-    0
+    0,
   );
 
   return (
     <main className="contenedor">
-
       <header className="encabezado">
         <div className="marca">UASD Académica</div>
         <h1>Catálogo académico</h1>
         <p>
-          Consulta las facultades, escuelas, carreras
-          y planes de estudio de la UASD.
+          Consulta las facultades, escuelas, carreras y planes de estudio de la
+          UASD.
         </p>
       </header>
 
@@ -181,18 +180,14 @@ function App() {
           onClick={() => void cargarFacultades()}
           disabled={cargando}
         >
-          {facultadesCargadas
-            ? "Actualizar facultades"
-            : "Cargar facultades"}
+          {facultadesCargadas ? "Actualizar facultades" : "Cargar facultades"}
         </button>
 
         <div className="lista-botones">
-          {facultades.map(facultad => (
+          {facultades.map((facultad) => (
             <button
               key={facultad.id}
-              className={
-                idFacultad === facultad.id ? "seleccionado" : ""
-              }
+              className={idFacultad === facultad.id ? "seleccionado" : ""}
               disabled={cargando}
               onClick={() => void seleccionarFacultad(facultad.id)}
             >
@@ -206,17 +201,13 @@ function App() {
         <h2>2. Selecciona una escuela</h2>
 
         {idFacultad === null ? (
-          <p className="texto-secundario">
-            Primero selecciona una facultad.
-          </p>
+          <p className="texto-secundario">Primero selecciona una facultad.</p>
         ) : (
           <div className="lista-botones">
-            {escuelas.map(escuela => (
+            {escuelas.map((escuela) => (
               <button
                 key={escuela.id}
-                className={
-                  idEscuela === escuela.id ? "seleccionado" : ""
-                }
+                className={idEscuela === escuela.id ? "seleccionado" : ""}
                 disabled={cargando}
                 onClick={() => seleccionarEscuela(escuela.id)}
               >
@@ -247,7 +238,7 @@ function App() {
         )}
 
         <div className="lista-carreras">
-          {carreras.map(carrera => (
+          {carreras.map((carrera) => (
             <button
               key={carrera.idCarrera}
               className={
@@ -273,20 +264,24 @@ function App() {
 
           {materias.length === 0 ? (
             <p className="texto-secundario">
-              Esta carrera todavía no tiene materias registradas
-              en nuestra base de datos.
+              Esta carrera todavía no tiene materias registradas en nuestra base
+              de datos.
             </p>
           ) : (
             <>
               <div className="resumen">
-                <span>{materias.length} materias</span>
+                <span>{materias.length} componentes del plan</span>
                 <span>{totalCreditos} créditos</span>
-                <span>{periodos.length} períodos</span>
+                <span>{periodos.length} bloques del plan</span>
               </div>
 
-              {periodos.map(periodo => (
+              {periodos.map((periodo) => (
                 <div key={periodo} className="bloque-periodo">
-                  <h3>Período {periodo}</h3>
+                  <h3>
+                    {periodo === 0
+                      ? "Colegio Universitario (bloque previo)"
+                      : `Período ${periodo}`}
+                  </h3>
 
                   <div className="tabla-scroll">
                     <table>
@@ -300,8 +295,8 @@ function App() {
 
                       <tbody>
                         {materias
-                          .filter(m => m.periodo === periodo)
-                          .map(materia => (
+                          .filter((m) => m.periodo === periodo)
+                          .map((materia) => (
                             <tr key={materia.id}>
                               <td>{materia.codigo}</td>
                               <td>{materia.nombre}</td>
@@ -318,24 +313,17 @@ function App() {
         </section>
       )}
 
-      {cargando && (
-        <p className="mensaje">Cargando información...</p>
-      )}
+      {cargando && <p className="mensaje">Cargando información...</p>}
 
       {error && (
-        <p className="mensaje-error" role="alert">{error}</p>
+        <p className="mensaje-error" role="alert">
+          {error}
+        </p>
       )}
 
-      <footer>
-        UASD Académica · Proyecto académico
-      </footer>
+      <footer>UASD Académica · Proyecto académico</footer>
     </main>
   );
 }
 
 export default App;
-
-
-
-
-

@@ -222,4 +222,3 @@ SELECT e.nombre AS escuela, f.nombre AS facultad
 FROM escuelas e JOIN facultades f ON f.id_facultad = e.id_facultad
 LEFT JOIN carreras c ON c.id_escuela = e.id_escuela
 GROUP BY e.id_escuela HAVING COUNT(c.id_carrera) = 0;
-
