@@ -1,42 +1,78 @@
 # UASD Académica
 
-Aplicación académica para consultar **facultades → escuelas → carreras** de la Universidad Autónoma de Santo Domingo (UASD). Permite seleccionar una escuela y pulsar **Consultar carreras**; al elegir una carrera con pensum registrado, muestra las materias organizadas por período.
+Aplicación académica para consultar el catálogo de **facultades → escuelas → carreras → materias** de la Universidad Autónoma de Santo Domingo (UASD).
+
+El usuario selecciona una facultad y una escuela, pulsa **Consultar carreras** y puede abrir el plan de estudios de una carrera para ver las asignaturas agrupadas por período y sus créditos.
+
+> **Proyecto académico no oficial.** Los planes se recopilaron de documentos de la UASD y pueden corresponder a versiones históricas. La aplicación no confirma qué planes están vigentes ni sustituye la información institucional.
+
+## Estado del proyecto
+
+Se han procesado **114 documentos de pensum**, distribuidos entre **9 facultades**. La reconstrucción automatizada incluida en este repositorio produce:
+
+| Dato | Total |
+|---|---:|
+| Facultades | 9 |
+| Escuelas | 50 |
+| Registros de carreras y programas | 115 |
+| Materias únicas | 2,864 |
+| Relaciones carrera–materia | 6,209 |
+
+Los **115 registros de programas no equivalen necesariamente a 115 carreras distintas o vigentes**: incluyen menciones, programas técnicos y versiones de planes. Los 114 documentos procesados tampoco significan que todos los planes sean actuales.
+
+**Caso especial pendiente de integrar al instalador:** el plan `000011` de **Licenciatura en Geografía** contiene el bloque previo «Colegio Universitario» (`AAA-0000`, 36 créditos), sin semestre convencional. En la instalación automática publicada, ese bloque no se enlaza a la carrera: Geografía muestra 139 créditos en lugar de los 175 indicados en el PDF. Una migración separada permite añadirlo como período `0`, elevando las relaciones totales a **6,210** sin crear materias nuevas. Dicha migración todavía no forma parte de `inicializar.py` ni de `schema.sql` en la versión revisada del repositorio. Si ya la aplicaste manualmente a tu base local, **no la reconstruyas** solo para seguir estos pasos.
 
 ## Tecnologías
 
 - **Backend:** Java 27, Spring Boot, Maven Wrapper y JDBC.
-- **Base de datos:** SQLite.
 - **Frontend:** React, TypeScript y Vite.
+- **Base de datos:** SQLite.
+- **Inicialización:** Python 3.10 o posterior (biblioteca estándar `sqlite3`, sin paquetes adicionales).
 
-> **Requisito de la asignación:** es una aplicación con backend en Java e interfaz web en React. Verificar con el docente si acepta una interfaz web en lugar de una aplicación de escritorio Java.
+> La interfaz es web, pero la lógica del servidor y las consultas a la base de datos están implementadas en Java. Para la entrega académica, confirma con el docente que se acepta una interfaz web en lugar de una interfaz de escritorio Java.
 
-## Estructura del repositorio
+## Estructura principal
 
 ```text
 uasd-academy/
-├── Backend/                         # API Java + Spring Boot
+├── Backend/                           # API con Spring Boot
 │   └── mvnw.cmd
-├── Frontend/                        # React + TypeScript
+├── Frontend/                          # Aplicación React + TypeScript
 │   └── package.json
 ├── database/
-│   ├── schema.sql                   # 1. Crear las 5 tablas
-│   ├── seed.sql                     # 2. Datos mínimos iniciales
-│   ├── ampliacion_masiva_uasd.sql   # 3. Ampliar catálogo de escuelas y carreras
-│   ├── pensum_informatica_200820.sql # 4. Materias de Informática
-│   └── inicializar.ps1              # Automatiza el orden en Windows
+│   ├── schema.sql                     # Estructura inicial de SQLite
+│   ├── seed.sql                       # Datos iniciales
+│   ├── ampliacion_masiva_uasd.sql     # Catálogo ampliado
+│   ├── normalizar_catalogo.sql        # Ajustes de códigos de programas
+│   ├── pensum_informatica_200820.sql  # Plan de Informática
+│   ├── pensums/                       # SQL de las demás facultades
+│   │   ├── artes/
+│   │   ├── ciencias/
+│   │   ├── economicas/
+│   │   ├── juridicas/
+│   │   ├── agronomicas/
+│   │   ├── salud/
+│   │   ├── humanidades/
+│   │   ├── ingenieria/
+│   │   └── educacion/
+│   ├── inicializar.py                 # Reconstrucción completa y validación
+│   └── inicializar.ps1                # Acceso rápido desde PowerShell
 └── README.md
 ```
 
-`database/uasd.db` se **genera localmente** y no tiene que subirse a Git. Tampoco deben subirse `Frontend/node_modules/`, `Frontend/dist/` ni `Backend/target/`.
+La base `database/uasd.db` se crea localmente y **no debe subirse al repositorio**. Tampoco deben subirse archivos `.db` de respaldo, `Frontend/node_modules/`, `Frontend/dist/` ni `Backend/target/`.
 
 ## Requisitos previos
 
-1. **Java 27** (la versión utilizada para desarrollar este proyecto); comprobar con `java -version`.
-2. **Node.js compatible con Vite 8** y npm; comprobar con `node -v` y `npm -v`. Se recomienda una versión LTS reciente.
-3. **SQLite CLI (`sqlite3`)** para la instalación automatizada, o **DBeaver** como alternativa visual.
-4. **PowerShell** en Windows. El backend incluye Maven Wrapper (`mvnw.cmd`), por lo que no hace falta instalar Maven globalmente.
+1. **Git**, para clonar el repositorio.
+2. **Java 27**: `java -version`.
+3. **Node.js y npm**, en versiones compatibles con el Vite usado por el frontend: `node -v` y `npm -v`.
+4. **Python 3.10+**: `python --version`.
+5. **Windows y PowerShell**, si deseas utilizar `inicializar.ps1`. El comando directo de Python también permite ejecutar el inicializador sin el archivo PowerShell.
 
-## Paso 1: descargar el repositorio
+No es necesario instalar Maven globalmente: el proyecto incluye Maven Wrapper. **Tampoco es necesario instalar `sqlite3.exe`** para la inicialización automática, porque Python utiliza su propio módulo `sqlite3`.
+
+## 1. Descargar el código
 
 Desde PowerShell:
 
@@ -45,92 +81,102 @@ git clone https://github.com/Logidex/uasd-academy.git
 cd uasd-academy
 ```
 
-Si ya tienes el repositorio descargado, abre su carpeta raíz en VS Code.
+Si ya tienes el repositorio, abre la carpeta raíz del proyecto en VS Code.
 
-## Paso 2: crear la base de datos
+## 2. Crear la base de datos completa
 
-### Opción A — Automática, recomendada (Windows + SQLite CLI)
+### Opción recomendada: instalador Python
 
-Comprueba primero que `sqlite3` funciona:
+Desde la **raíz del repositorio**:
 
 ```powershell
-sqlite3 -version
+cd database
+python inicializar.py
+cd ..
 ```
 
-Después, desde la raíz del proyecto:
+El inicializador ejecuta **15 scripts SQL**, empezando por la estructura y terminando con Ingeniería Geomática. Incluye la normalización de códigos que evita duplicar las carreras de Periodismo y Psicología Clínica. Antes de reemplazar un archivo existente, comprueba claves foráneas, integridad y los conteos esperados.
+
+**Si `database/uasd.db` ya existe, el programa no la sobrescribe.** Para comprobar la base existente sin modificarla:
+
+```powershell
+cd database
+python inicializar.py --verificar
+cd ..
+```
+
+Para reconstruirla deliberadamente, **detén primero el backend y cierra las conexiones de DBeaver**. Asegúrate de conservar cualquier cambio manual que no esté integrado en los scripts:
+
+```powershell
+cd database
+python inicializar.py --recrear
+cd ..
+```
+
+El inicializador genera una base temporal, la valida y crea una copia de respaldo con fecha antes de reemplazar `uasd.db`. Aun así, es conveniente guardar un respaldo propio antes de usar `--recrear`.
+
+### Alternativa: PowerShell
+
+En Windows puedes utilizar el mismo instalador mediante su envoltura:
 
 ```powershell
 cd database
 .\inicializar.ps1
+.\inicializar.ps1 -Verificar
+# Solo si deseas reconstruir la base actual, tras guardar respaldo:
+# .\inicializar.ps1 -Recrear
 cd ..
 ```
 
-El script crea `database/uasd.db` en este orden:
+### Alternativa manual: DBeaver
 
-| Orden | Archivo | Función |
-|---|---|---|
-| 1 | `schema.sql` | Crea `facultades`, `escuelas`, `carreras`, `materias`, `carrera_materias` |
-| 2 | `seed.sql` | Inserta facultades, escuelas y carreras iniciales |
-| 3 | `ampliacion_masiva_uasd.sql` | Amplía el catálogo de facultades, escuelas y programas |
-| 4 | `pensum_informatica_200820.sql` | Inserta materias y períodos del plan de Informática |
+Puedes ejecutar los SQL sobre una **base vacía**, respetando estrictamente el orden de la lista `SCRIPT_ORDER` dentro de `database/inicializar.py`. Ya no son solamente los cuatro scripts iniciales. En DBeaver, **Alt + X** suele ejecutar todo el script; **Ctrl + Enter** ejecuta normalmente la instrucción actual. Confirma la transacción si tienes desactivado el autocommit.
 
-**Si ya existe `uasd.db`, no se sobrescribe.** Para reconstruirla intencionalmente, detén primero el backend y ejecuta desde `database/`:
+**No ejecutes `seed.sql` sobre una base poblada** ni combines una reconstrucción con importaciones manuales incompletas.
 
-```powershell
-.\inicializar.ps1 -Recrear
-```
+### Comprobar el resultado
 
-La opción `-Recrear` genera una base nueva y respalda la base anterior con fecha antes de sustituirla. Guarda tus propios cambios SQL antes de usarla: una reconstrucción restaura **solo los datos de estos scripts**.
-
-Si PowerShell no permite ejecutar el archivo por su política local, puedes utilizar la opción manual de DBeaver. No hace falta desactivar permanentemente ninguna protección.
-
-### Opción B — DBeaver (sin SQLite CLI)
-
-1. Crea un archivo vacío llamado `database/uasd.db` y abre una conexión **SQLite** de DBeaver apuntando a ese archivo.
-2. Ejecuta los cuatro scripts de la tabla anterior **en ese orden**. Para ejecutar un archivo completo en DBeaver usa la acción *Ejecutar script SQL* (normalmente `Alt + X`); `Ctrl + Enter` puede ejecutar solo la sentencia actual.
-3. Si el autocommit está desactivado, confirma con **Commit** antes de abrir el backend.
-4. No vuelvas a ejecutar `seed.sql` sobre una base ya poblada: sus IDs iniciales son fijos. Para reconstruir desde cero, utiliza una base vacía.
-
-**Comprobación en DBeaver:**
+En DBeaver:
 
 ```sql
 SELECT
   (SELECT COUNT(*) FROM facultades) AS facultades,
   (SELECT COUNT(*) FROM escuelas) AS escuelas,
-  (SELECT COUNT(*) FROM carreras) AS carreras,
-  (SELECT COUNT(*) FROM materias) AS materias,
-  (SELECT COUNT(*) FROM carrera_materias) AS relaciones_materias;
+  (SELECT COUNT(*) FROM carreras) AS programas,
+  (SELECT COUNT(*) FROM materias) AS materias_unicas,
+  (SELECT COUNT(*) FROM carrera_materias) AS relaciones;
 
 PRAGMA foreign_key_check;
+PRAGMA integrity_check;
 ```
 
-En una instalación nueva con **los cuatro archivos suministrados**, esperamos **9 facultades, 50 escuelas, 106 carreras/programas, 51 materias y 51 relaciones carrera–materia**; `foreign_key_check` debe devolver **cero filas**. El total de 106 incluye una carrera del `seed.sql` que no aparece en el catálogo masivo; una base preexistente puede mostrar otros totales. Son datos de referencia del proyecto, **no un censo certificado de carreras vigentes**.
+Con la reconstrucción automática publicada, los conteos esperados son **9, 50, 115, 2,864 y 6,209**, respectivamente. `foreign_key_check` debe devolver **cero filas** y `integrity_check` debe devolver `ok`.
 
-## Paso 3: ejecutar el backend Java
+Si aplicaste a tu base local el ajuste especial de Geografía, el último conteo será **6,210**. Ese valor diferente no indica un error en sí mismo.
 
-Abre una terminal en la raíz del proyecto:
+## 3. Ejecutar el backend Java
+
+Abre una terminal desde la raíz del repositorio:
 
 ```powershell
 cd Backend
 .\mvnw.cmd spring-boot:run
 ```
 
-Spring Boot usa `../database/uasd.db` **relativo a la carpeta `Backend`**, por lo que es importante iniciar Maven desde ahí. El servidor estará disponible normalmente en `http://localhost:8080`.
+El proyecto utiliza la base `../database/uasd.db` con la carpeta `Backend` como directorio de trabajo. Normalmente la API estará disponible en `http://localhost:8080`.
 
-Verifica estos endpoints en el navegador:
-
-| Ruta | Qué devuelve |
+| Endpoint | Función |
 |---|---|
-| `http://localhost:8080/api/facultades` | Facultades |
-| `http://localhost:8080/api/escuelas/facultad/1` | Escuelas de una facultad (ejemplo ID 1) |
-| `http://localhost:8080/api/carreras/escuela/1` | Carreras de una escuela (ejemplo ID 1) |
-| `http://localhost:8080/api/materias/carrera/1` | Materias de una carrera (ejemplo ID 1) |
+| `GET /api/facultades` | Listar facultades |
+| `GET /api/escuelas/facultad/{idFacultad}` | Listar escuelas por facultad |
+| `GET /api/carreras/escuela/{idEscuela}` | Listar carreras por escuela |
+| `GET /api/materias/carrera/{idCarrera}` | Consultar las asignaturas de un pensum |
 
-Los IDs se usan como ejemplos; consulta primero la API o la base de datos para saber cuáles corresponden a cada registro.
+Los identificadores entre llaves deben sustituirse por los IDs reales que devuelve la API; no son códigos oficiales de programas.
 
-## Paso 4: ejecutar React
+## 4. Ejecutar el frontend React
 
-**Sin detener el backend**, abre una segunda terminal desde la raíz:
+**Sin detener Java**, abre otra terminal desde la raíz:
 
 ```powershell
 cd Frontend
@@ -138,57 +184,61 @@ npm install
 npm run dev
 ```
 
-Abre la URL que muestre Vite, normalmente `http://localhost:5173`.
+Abre la dirección local que indique Vite, habitualmente `http://localhost:5173`.
 
-El servidor de desarrollo Vite debe tener un proxy que envíe `/api` a `http://localhost:8080`, por ejemplo en `Frontend/vite.config.ts`:
+El frontend realiza solicitudes a `/api`; el proxy de `Frontend/vite.config.ts` debe redirigirlas a `http://localhost:8080`. Si React no carga datos, comprueba que el backend esté funcionando y que el proxy apunte al puerto correcto.
 
-```ts
-server: {
-  proxy: {
-    "/api": {
-      target: "http://localhost:8080",
-      changeOrigin: true
-    }
-  }
-}
-```
-
-Si la API responde en el navegador pero React falla, comprueba que **ambos servidores están ejecutándose** y que el proxy coincide con el puerto del backend.
-
-## Paso 5: probar la aplicación
+## 5. Probar la aplicación
 
 1. Pulsa **Cargar facultades**.
-2. Selecciona **Facultad de Ciencias**.
-3. Selecciona **Escuela de Informática**.
-4. Pulsa **Consultar carreras**.
-5. Selecciona **Licenciatura en Informática** para ver el pensum registrado: **51 materias, 186 créditos y 10 períodos**.
+2. Elige una facultad y luego una escuela.
+3. Pulsa **Consultar carreras**.
+4. Selecciona una carrera para ver las materias por período y la suma de créditos.
 
-Las demás carreras pueden mostrar que su pensum todavía no está registrado. Eso no impide consultar el catálogo de carreras.
+Casos útiles de verificación:
 
-## Comprobaciones para la entrega
+| Programa | Resultado esperado |
+|---|---|
+| Licenciatura en Informática, plan `200820` | 51 materias, 186 créditos |
+| Ingeniería Geomática, plan `200910` | 23 asignaturas, 76 créditos |
+| Licenciatura en Geografía, plan `000011` | 139 créditos en instalación base; 175 si se aplicó la migración del bloque previo |
 
-En la carpeta `Backend`:
+**Presentación pendiente:** el frontend publicado muestra encabezados numéricos como `Período 0`. Se recomienda mostrar `Colegio Universitario (bloque previo)` cuando corresponda y distinguir tesis e internados de los períodos académicos ordinarios. La consulta de Java no depende de ese cambio visual.
+
+## 6. Pruebas del proyecto
+
+Backend, dentro de `Backend/`:
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-En la carpeta `Frontend`:
+Frontend, dentro de `Frontend/`:
 
 ```powershell
 npm run build
 npm run lint
 ```
 
-También verifica que el archivo `database/uasd.db` pueda reconstruirse desde los SQL del repositorio.
+Base de datos, dentro de `database/`:
 
-## Notas sobre los datos
+```powershell
+python inicializar.py --verificar
+```
 
-- El catálogo incluye licenciaturas, ingenierías, menciones y programas técnicos. Los **106 registros** no representan necesariamente 106 carreras únicas activas.
-- Algunos códigos (`INF001`, `UASD-LOC-*`, `PLAN-P-*`) son **identificadores internos o referencias de planes**, no códigos oficiales de carrera de la UASD.
-- El pensum de Informática está identificado como **plan 200820**. No se afirma que sea el pensum vigente.
-- Fuentes de referencia declaradas en los scripts: [Planes de grado UASD](https://app.uasd.edu.do/planesgrado/) y [Oferta académica UASD](https://uasd.edu.do/oferta-academica/). El script del pensum también consigna otras referencias; la validez y vigencia de cada dato deben verificarse con la institución.
+El chequeo `--verificar` comprueba la integridad y muestra los conteos reales; **no garantiza que coincidan con los de una reconstrucción nueva**. La comprobación estricta de totales se realiza al crear la base desde cero.
 
-## Autoría y finalidad
+## Notas sobre los datos y el modelo
 
-Proyecto académico de consulta del catálogo de carreras de la UASD. Se utiliza una base SQLite local y una API Java; no es un portal oficial de la universidad.
+- Los planes fueron extraídos de documentos de la UASD. Un programa puede tener varias versiones y el catálogo no confirma vigencia académica.
+- Algunos códigos `PLAN-P-*` o `UASD-LOC-*` son identificadores internos de la aplicación, no códigos oficiales.
+- La tabla `fuentes_pensum` permite registrar referencias y versiones de los documentos procesados.
+- Las tablas con nombres como `_edu_*`, `_huma_*` o `_ing_*` son **auxiliares temporales** usadas durante importaciones; no son necesarias para las consultas normales de React y Java.
+- Las tablas permanentes principales son `facultades`, `escuelas`, `carreras`, `materias`, `carrera_materias` y `fuentes_pensum`.
+- El esquema de la versión revisada utiliza `CHECK (periodo > 0)`. Para incorporar el bloque previo de Geografía como `periodo = 0` en **futuras reconstrucciones**, aún falta actualizar `schema.sql` e integrar su migración al inicializador. **No basta con editar `schema.sql` para alterar una base ya creada.**
+
+Fuentes de consulta institucional: [Planes de grado UASD](https://app.uasd.edu.do/planesgrado/) y [Oferta académica UASD](https://uasd.edu.do/oferta-academica/).
+
+## Autoría y alcance
+
+Proyecto académico de consulta del catálogo universitario. No representa a la Universidad Autónoma de Santo Domingo ni sustituye sus servicios oficiales.
