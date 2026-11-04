@@ -4,6 +4,7 @@ hasta haber terminado y verificado todo. Requiere solo Python 3.10+ (stdlib).
 """
 from __future__ import annotations
 import argparse
+from contextlib import closing
 from datetime import datetime
 from pathlib import Path
 import os
@@ -19,7 +20,7 @@ SCRIPT_ORDER = [
     'seed.sql',
     'ampliacion_masiva_uasd.sql',
     'normalizar_catalogo.sql',
-    'pensum_informatica_200820.sql',
+    'pensums/ciencias/pensum_informatica_200820.sql',
     'pensums/artes/pensums_artes_19.sql',
     'pensums/ciencias/pensums_ciencias_9.sql',
     'pensums/economicas/pensums_economicas_11.sql',
@@ -67,6 +68,10 @@ def check(conn, strict=False):
     print(f'Geografia: {geog[0]} componentes, {geog[1]} creditos')
     print('Conteos:', ', '.join(f'{k}={v}' for k,v in actual.items()))
     print(f'Geomatica: {geom[0]} materias, {geom[1]} creditos; integridad OK')
+    if not strict and any(actual[table] != expected for table, expected in EXPECTED.items()):
+        print('AVISO: los conteos difieren de la instalacion completa; pueden faltar pensums.')
+        print('Esperados:', ', '.join(f'{k}={v}' for k, v in EXPECTED.items()))
+        print('Consulta el README antes de reconstruir la base con --recrear.')
     return actual
 
 
@@ -78,7 +83,7 @@ def main():
     if args.verificar:
         if not DEST.is_file():
             parser.error('No existe database/uasd.db')
-        with sqlite3.connect(str(DEST)) as conn:
+        with closing(sqlite3.connect(str(DEST))) as conn:
             conn.execute('PRAGMA foreign_keys=ON')
             check(conn, strict=False)
         return 0
@@ -88,7 +93,7 @@ def main():
         parser.error('Existe uasd_nueva_temporal.db. Revisala y retirala antes de reconstruir.')
     print('Creando base temporal... No se modificara la actual hasta validar todo.')
     try:
-        with sqlite3.connect(str(TEMP)) as conn:
+        with closing(sqlite3.connect(str(TEMP))) as conn:
             conn.execute('PRAGMA foreign_keys=ON')
             for n, rel in enumerate(SCRIPT_ORDER,1):
                 path = ROOT/rel

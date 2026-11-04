@@ -2,7 +2,7 @@
 
 Aplicación académica para consultar el catálogo de **facultades → escuelas → carreras → materias** de la Universidad Autónoma de Santo Domingo (UASD).
 
-El usuario selecciona una facultad y una escuela, pulsa **Consultar carreras** y puede abrir el plan de estudios de una carrera para ver las asignaturas agrupadas por período y sus créditos.
+La página principal carga automáticamente las facultades. Al elegir una se muestran sus escuelas; al seleccionar una escuela aparecen sus carreras. Cada carrera tiene una página de detalle con sus asignaturas agrupadas por período y sus créditos.
 
 > **Proyecto académico no oficial.** Los planes se recopilaron de documentos de la UASD y pueden corresponder a versiones históricas. La aplicación no confirma qué planes están vigentes ni sustituye la información institucional.
 
@@ -27,7 +27,7 @@ El instalador incorpora esta corrección **si se utilizan juntos** `database/sch
 ## Tecnologías
 
 - **Backend:** Java 27, Spring Boot, Maven Wrapper y JDBC.
-- **Frontend:** React, TypeScript y Vite.
+- **Frontend:** React, TypeScript, React Router y Vite.
 - **Base de datos:** SQLite.
 - **Inicialización:** Python 3.10 o posterior (biblioteca estándar `sqlite3`, sin paquetes adicionales).
 
@@ -40,13 +40,18 @@ uasd-academy/
 ├── Backend/                           # API con Spring Boot
 │   └── mvnw.cmd
 ├── Frontend/                          # Aplicación React + TypeScript
+│   ├── src/
+│   │   ├── componentes/              # Elementos compartidos de la interfaz
+│   │   ├── paginas/                   # Facultades, facultad y detalle de carrera
+│   │   ├── modelos/                   # Tipos del catálogo
+│   │   ├── servicios/                 # Consultas a la API y estado de carga
+│   │   └── App.tsx                    # Rutas de la aplicación
 │   └── package.json
 ├── database/
 │   ├── schema.sql                     # Estructura inicial de SQLite
 │   ├── seed.sql                       # Datos iniciales
 │   ├── ampliacion_masiva_uasd.sql     # Catálogo ampliado
 │   ├── normalizar_catalogo.sql        # Ajustes de códigos de programas
-│   ├── pensum_informatica_200820.sql  # Plan de Informática
 │   ├── pensums/                       # SQL de las demás facultades
 │   │   ├── artes/
 │   │   ├── ciencias/
@@ -207,10 +212,14 @@ El frontend realiza solicitudes a `/api`; el proxy de `Frontend/vite.config.ts` 
 
 ## 5. Probar la aplicación
 
-1. Pulsa **Cargar facultades**.
-2. Elige una facultad y luego una escuela.
-3. Pulsa **Consultar carreras**.
-4. Selecciona una carrera para ver las materias por período y la suma de créditos.
+1. La página principal carga las facultades automáticamente; selecciona una para abrir sus escuelas.
+2. Selecciona una escuela para mostrar sus carreras en la misma página.
+3. Selecciona una carrera para abrir su plan de estudios, con las materias por período y la suma de créditos.
+4. Usa **Volver atrás**, **Inicio** o los controles del navegador para navegar por el catálogo.
+
+Las páginas tienen direcciones propias: `/`, `/facultades/{idFacultad}` y `/facultades/{idFacultad}/escuelas/{idEscuela}/carreras/{idCarrera}`. La escuela seleccionada se conserva en el parámetro `escuela` de la página de facultad. Al publicar el frontend, el servidor debe devolver `index.html` para estas rutas de React; Vite ya lo hace durante el desarrollo.
+
+Los emblemas de las facultades se cargan desde la [página oficial de facultades de la UASD](https://uasd.edu.do/facultades/) y requieren conexión a internet.
 
 Casos útiles de verificación:
 
@@ -243,7 +252,7 @@ Base de datos, dentro de `database/`:
 python inicializar.py --verificar
 ```
 
-El chequeo `--verificar` comprueba la integridad y muestra los conteos reales; **no garantiza que coincidan con los de una reconstrucción nueva**. La comprobación estricta de totales se realiza al crear la base desde cero.
+El chequeo `--verificar` comprueba la integridad, muestra los conteos reales y avisa si difieren de la instalación completa. La comprobación estricta de totales se realiza al crear la base desde cero.
 
 ## Notas sobre los datos y el modelo
 
